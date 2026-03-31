@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>Maybe function defined elsewhere. Search global.<|end|><|start|>assistant<|channel|>analysis to=container.exec code<|message|>{"command":["bash","-lc","grep -R \"find_ordering_name\" -n | head"]}

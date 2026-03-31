@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>Open that.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.open_file code<|message|>{"path":"django/db/models/sql/query.py","line_start":1950,"line_end":1985,"line_numbers":true}

@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>Open get_order_by at line 271.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.open_file code<|message|>{"path":"django/db/models/sql/compiler.py","line_start":260,"line_end":310,"line_numbers":true}

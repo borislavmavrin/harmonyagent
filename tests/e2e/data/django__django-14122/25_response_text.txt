@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>Open that area lines 640-660.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.open_file code<|message|>{"path":"django/db/models/query.py","line_start":640,"line_end":670,"line_numbers":true}

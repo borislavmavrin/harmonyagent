@@ -1,0 +1,58 @@
+<|channel|>analysis<|message|>So OrderBy holds expression. For field case, expression is the expression created by transform function, presumably Col. get_group_by_cols will return itself or the Col? In OrderBy.get_group_by_cols earlier, it uses BaseExpression.get_group_by_cols; if not contains_aggregate: return [self]. But for OrderBy it's not contains_aggregate? contains_aggregate property - maybe inherited from Expression, default False. So it will return [self], i.e., the OrderBy object. So get_group_by uses expressions.extend(expr.get_group_by_cols()), which will add the OrderBy expression into group_by.
+
+To skip, we should detect when expr is instance OrderBy, and its expression is a Col or Ref referencing the main model field. For default ordering, the expr expression is transform_function(t, alias). transform_function is likely a function forwarded from _setup_joins; if the field has transform, maybe an expression like lookup transform, but usually it's just a Col.
+
+We can simply detect if expr is an instance of OrderBy and its expression has attribute target and its target is a Field, and the field name is in the meta ordering list. We'll need to remove that from group_by.
+
+However, also check when is_ref? In our skip condition we already check not is_ref. Because is_ref True occurs when column in SELECT/annotation? For default ordering fields, is_ref will be False. So skip only if not is_ref.
+
+Implementation:
+
+```
+for expr, (sql, params, is_ref) in order_by:
+    if not is_ref:
+        if self._meta_ordering:
+            # Check if expr is OrderBy and expression's target field name matches
+            # any of meta_ordering fields (excluding leading '-' or '?')
+            if isinstance(expr, OrderBy):
+                inner_expr = expr.expression
+                # Outer relation for default can be Col or RawSQL etc
+                # We check if inner_expr has 'target' attribute for a Field
+                if hasattr(inner_expr, 'target'):
+                    field_name = inner_expr.target.name
+                    # Clean meta ordering names
+                    meta_field_names = {get_order_dir(f, 'ASC')[0] for f in self._meta_ordering}
+                    if field_name in meta_field_names:
+                        continue
+        expressions.extend(expr.get_group_by_cols())
+```
+
+But we also need to handle if expr is order_by expression pointing to annotation? Already is_ref True (if in annotation_select). That case not skip.
+
+Also for default ordering with related field? For Meta ordering using related fields with lookups like 'contact__last_name', we may still want to skip grouping. That case the inner expression may be a Col/Ref with alias and target? Target would be a Field on related model? In that case, default ordering may not need to group by that; but the bug refers to ordering fields or presumably only direct fields? But likely all default ordering fields, even with relations, should be excluded.
+
+So implement more general rule: For every expr added from ordering (not is_ref) and self._meta_ordering not None, skip adding group_by, as default ordering not needed. This might skip grouping even if user explicitly ordered by same fields via order_by() method? But self._meta_ordering would be set only when Meta ordering used as default. If user gives explicit order_by('some_field'), that field still becomes part of ordering but self._meta_ordering remains None? Wait in get_order_by, at start:
+
+```
+if self.query.extra_order_by:
+    ordering = self.query.extra_order_by
+elif not self.query.default_ordering:
+    ordering = self.query.order_by
+elif self.query.order_by:
+    ordering = self.query.order_by
+elif self.query.get_meta().ordering:
+    ordering = self.query.get_meta().ordering
+    self._meta_ordering = ordering
+else:
+    ordering = []
+```
+
+So if user explicitly set order_by, that will be used even if self.default_ordering is true, but still order_by takes precedence. So self._meta_ordering remains None (since order_by set). Good. So our skip will only trigger when used default ordering (i.e., not overridden).
+
+Hence implement skip logic with self._meta_ordering.
+
+Ok.
+
+Let's patch get_group_by accordingly.
+
+<|end|><|start|>assistant<|channel|>analysis to=repo_browser.apply_patch code<|message|>{"patch":"*** Begin Patch\n*** Update File: django/db/models/sql/compiler.py\n@@\n-        for expr, (sql, params, is_ref) in order_by:\n-            # Skip References to the select clause, as all expressions in the select clause are already part of the group by.\n-            if not is_ref:\n-                expressions.extend(expr.get_group_by_cols())\n+        for expr, (sql, params, is_ref) in order_by:\n+            # Skip References to the select clause, as all expressions in the select clause are already part of the group by.\n+            if not is_ref:\n+                # When default ordering from the model Meta is used, the ordering\n+                # columns should not be added to the GROUP BY clause.  These\n+                # columns are stored in ``self._meta_ordering`` by\n+                # ``get_order_by`` which is only set when the ordering comes\n+                # from ``Meta.ordering`` and not from an explicit ``order_by``\n+                # call.\n+                if self._meta_ordering:\n+                    # ``self._meta_ordering`` contains the original order\n+                    # strings (e.g., ``['-date', 'name']``).  Extract the\n+                    # field names without direction prefixes for comparison.\n+                    meta_field_names = {get_order_dir(f, 'ASC')[0] for f in self._meta_ordering}\n+                    # ``expr`` is usually an ``OrderBy`` instance for plain\n+                    # field names.  For default ordering we want to skip the\n+                    # column regardless of whether it is a reference to an\n+                    # alias, as it should not participate in GROUP BY.\n+                    from django.db.models.expressions import OrderBy\n+                    if isinstance(expr, OrderBy):\n+                        # The underlying expression might be a ``Col`` pointing\n+                        # to a model field.  If it references a field that\n+                        # appears in ``meta_field_names`` we skip adding it.\n+                        inner = expr.expression\n+                        # ``inner`` is typically a ``Col`` or ``Ref``.\n+                        target = getattr(inner, 'target', None)\n+                        if target and getattr(target, 'name', None) in meta_field_names:\n+                            continue\n+                        # In other cases (e.g., expressions involving lookups\n+                        # or transforms) the default ordering may reference a\n+                        # related attribute.  Those should also be omitted\n+                        # from the GROUP BY.\n+                        if hasattr(inner, 'alias') and inner.alias and inner.alias not in self.query.annotation_select:\n+                            # ``inner`` originates from the main table or a join\n+                            # but is part of the default ordering; skip it.\n+                            continue\n+                expressions.extend(expr.get_group_by_cols())\n*** End Patch"}

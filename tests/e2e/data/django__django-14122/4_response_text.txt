@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>We don't have ripgrep. Use grep.<|end|><|start|>assistant<|channel|>analysis to=container.exec code<|message|>{"command":["bash","-lc","grep -R \"ordering\" -n django | head"]}

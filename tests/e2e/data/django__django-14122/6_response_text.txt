@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>Search for expression/grouping.<|end|><|start|>assistant<|channel|>analysis to=container.exec code<|message|>{"command":["bash","-lc","grep -R \"GROUP BY\" -n django/db | head"]}

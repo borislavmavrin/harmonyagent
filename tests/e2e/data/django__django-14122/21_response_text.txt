@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>No pytest. Maybe tests via Django's test runner using manage.py? Let's check test folder.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.print_tree code<|message|>{"path":"tests","depth":2}

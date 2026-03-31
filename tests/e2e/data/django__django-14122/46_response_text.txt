@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>Open at line 724.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.open_file code<|message|>{"path":"django/db/models/sql/compiler.py","line_start":720,"line_end":760,"line_numbers":true}

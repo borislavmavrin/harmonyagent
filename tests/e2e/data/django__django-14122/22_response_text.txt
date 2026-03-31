@@ -1,0 +1,5 @@
+<|channel|>analysis<|message|>Let's cl a simple test snippet to reproduce. But we don't have Django test environment. The issue: grouping with ordering fields leads to wrong aggregation. We need to adjust get_group_by so ordering columns that are default orderings (meta with ordering) should be omitted. But it may use order_by to add to group by only if not is_ref.
+
+For default ordering, order_by is set? When default ordering is used and query has ordering field? query.get_meta().ordering used in ordered property earlier. For group by, if query has default ordering? Probably order_by list is set from self._get_columns maybe.
+
+Look at BaseQuery or Query.get_sql? Wait order_by is : Let's search in QueryBuilder for order_by when no ordering specified. Search.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.search code<|message|>{"path":"django/db/models","query":"order_by=", "max_results":20}

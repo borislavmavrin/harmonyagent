@@ -1,0 +1,10 @@
+<|channel|>analysis<|message|>Scrolling further for ordering. But earlier we found involvement of grouping with order_by in compiler.get_group_by not in Query.select. The bug likely in compiler.get_group_by code lines 128-132. The ordering list contains tuples (expr, (sql, params, is_ref)). In that loop, condition:
+
+```
+for expr, (sql, params, is_ref) in order_by:
+    # Skip References to the select clause, as all expressions in the select clause are already part of the group by.
+    if not is_ref:
+        expressions.extend(expr.get_group_by_cols())
+```
+
+Here if is_ref is True then it will be skipped. For default ordering derived from Meta, the order_by expressions maybe Refs? When no ordering argument specified, ordering uses query.default_ordering? Actually get_order_by method may build order_by list accordingly. Let's inspect get_order_by in compiler, or maybe in get_order_by function imported earlier from django/db/models/sql/query.py. Search for get_order_by.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.search code<|message|>{"path":"django/db/models/sql/query.py","query":"def get_order_by", "max_results":20}

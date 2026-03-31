@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>The method add_ordering defined earlier. Let's locate. Search "add_ordering".<|end|><|start|>assistant<|channel|>analysis to=repo_browser.search code<|message|>{"path":"django/db/models/query.py","query":"add_ordering", "max_results":20}

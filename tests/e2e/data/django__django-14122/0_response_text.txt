@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>We need to implement change in Django code to exclude ordering fields from GROUP BY. Let's inspect repository.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.print_tree code<|message|>{"path": "", "depth": 3}

@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>The lines changed might be slightly different. Let's open the current code block to identify correct lines.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.open_file code<|message|>{"path":"django/db/models/sql/compiler.py","line_start":120,"line_end":145,"line_numbers":true}

@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>Need ordering within querysets. Search in db/models/query.<|end|><|start|>assistant<|channel|>analysis to=container.exec code<|message|>{"command":["bash","-lc","grep -R \"ordering\" -n django/db | head"]}

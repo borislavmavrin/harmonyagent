@@ -1,0 +1,8 @@
+<|channel|>analysis<|message|>Back to get_order_by function. Looking at mapping: earlier 'col, order = get_order_dir(field, asc)'. After that, it checks:
+
+- if col in self.query.annotation_select: set is_ref True
+- elif col in self.query.annotations: etc
+- elif '.' in field: raw sql
+- else if not self.query.extra or col not in self.query.extra: order_by.extend(self.find_ordering_name(...))
+
+So for normal field names, it calls find_ordering_name which returns list of OrderBy expressions. Let's inspect find_ordering_name.<|end|><|start|>assistant<|channel|>repo_browser.search<|channel|>analysis code<|message|>{"path":"django/db/models/sql/query.py","query":"def find_ordering_name", "max_results":20}

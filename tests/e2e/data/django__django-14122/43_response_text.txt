@@ -1,0 +1,18 @@
+<|channel|>analysis<|message|>Where is default_ordering used? Probably in get_order_by as above.
+
+Now we need to modify get_group_by to skip default ordering columns.
+
+Let's design: after retrieving order_by list, before iterating, we can build a set of columns to exclude: If self._meta_ordering is not None, convert each field name via get_order_dir to raw field name, then get column via query.get_default_sorting? Wait query.find_ordering_name? But we don't have that function here. But we can rely on something simpler: In the loop for order_by, we already have expr objects. We can examine expr and check if `not is_ref` and `expr.sorting_expr.is_ref?` Wait is_ref indicates if ordering expression refers to column in SELECT. In our case default ordering entries are not in SELECT thus is_ref False. For these, we can inspect expr.expr maybe and see if it is a Ref or Derivation. For default ordering, expr.expr is something like sorted by order_by of the model field. Looking at get_order_by: When col not in annotation_select and not in query.extra, we go to:
+
+```
+if col in self.query.annotation_select:
+...
+elif col in self.query.annotations:
+...
+elif '.' in field: ...
+elif not self.query.extra or col not in self.query.extra:
+   # 'col' is of the form 'field' or 'field1__field2' etc.
+   order_by.extend(self.find_ordering_name(field, self.query.get_meta(), default_order=asc))
+```
+
+So for normal field, it calls find_ordering_name. Let's inspect find_ordering_name.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.search code<|message|>{"path":"django/db/models/sql/query.py","query":"def find_ordering_name", "max_results":20}

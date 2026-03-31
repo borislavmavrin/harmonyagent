@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>Already looked earlier at lines 1161 etc. Let's open around 1200 to see context.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.open_file code<|message|>{"path":"django/db/models/query.py","line_start":1170,"line_end":1220,"line_numbers":true}

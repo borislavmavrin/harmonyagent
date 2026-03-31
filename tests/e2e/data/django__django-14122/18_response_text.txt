@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>No. But default ordering logic for GroupBy queries is at line 120 still earlier we saw logic: ordering_normal? Let's search for "group_by" earlier for handling ordering.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.search code<|message|>{"path":"django/db/models/query.py","query":"group_by", "max_results":20}

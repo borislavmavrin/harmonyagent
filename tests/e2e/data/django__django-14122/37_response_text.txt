@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>Search in entire repo.<|end|><|start|>assistant<|channel|>analysis to=container.exec code<|message|>{"command":["bash","-lc","grep -R \"def get_order_dir\" -n django | head"]}

@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>Also, get_group_by_cols for OrderBy? Search.<|end|><|start|>assistant<|channel|>analysis to=container.exec code<|message|>{"command":["bash","-lc","grep -n \"def get_group_by_cols\" -R django/db/models | head"]}

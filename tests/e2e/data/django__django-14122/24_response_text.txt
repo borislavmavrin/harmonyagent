@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>Search for "order_by" variable in models.<|end|><|start|>assistant<|channel|>analysis to=container.exec code<|message|>{"command":["bash","-lc","grep -R \"order_by\" -n django/db/models | head"]}

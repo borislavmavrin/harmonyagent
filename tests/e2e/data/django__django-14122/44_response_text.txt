@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>Search.<|end|><|start|>assistant<|channel|>analysis to=container.exec code<|message|>{"command":["bash","-lc","grep -n \"find_ordering_name\" -R django/db/models/sql/query.py"]}

@@ -1,0 +1,21 @@
+<|channel|>analysis<|message|>Thus, ordering expressions for default ordering will be produced by find_ordering_name returning list of tuples (OrderBy(expr, descending), False). So is_ref remains False. So we can check.
+
+Thus modify get_group_by for each expr, when not is_ref and self._meta_ordering is not None, skip adding expr.get_group_by_cols().
+
+Implement: after for expr, _, _ in order_by: if not is_ref: we skip if self._meta_ordering and perhaps is default ordering. We can check if expr is an OrderBy and its expr is a Ref or F? But easier: If self._meta_ordering is set, then we skip all ordering expressions that are not is_ref. But what about cases where user specifies explicit ordering on non-default field but such expression uses is_ref False too (like 'name'). This would incorrectly skip grouping by name although user ordered by name. But rarely needed? Actually if there is explicit ordering, it matters for final results but grouping may not need column. In queries with aggregation, specifying order_by may be used after grouping? E.g., Model.objects.annotate().order_by('name'). That is allowed and should order returned aggregated results by name. Should group by name? For aggregate query with order_by('name'), is grouping needed? Usually not needed because MySQL may not allow ORDER BY by non-grouped column without aggregate. But Django uses grouping by all fields in select. For aggregate query with order_by(['name']), group_by might need name to satisfy SQL? Wait object query: .annotate(count=Sum('num')).order_by('name'). In standard SQL SELECT name, SUM(num) FROM table GROUP BY name ORDER BY name; group_by includes name. That is correct. So we must not skip grouping of name if explicitly ordered by. But our skip for all is_ref False will prevent grouping and cause error. But the bug may not arise if no explicit ordering, only default ordering. So we can conditionally skip only when ordering came from Meta (self._meta_ordering). But self._meta_ordering might be only set when default ordering from Meta is used. Good: In that scenario, order_by is built from self._meta_ordering. In that case, we want not to group by those columns. This will still fail if user explicitly order by fields that are also in meta ordering? But that case is rare and maybe acceptable.
+
+Thus implement: In get_group_by, we need to detect self._meta_ordering. We can store it in self._meta_ordering in get_order_by function. So modify get_group_by loop: 
+
+```
+skip_ordering_cols = set(self._meta_ordering) if self._meta_ordering else None
+```
+
+Then in loop for expr, (sql, params, is_ref) in order_by:
+    if not is_ref:
+        if self._meta_ordering:
+            # Check if this expr is directly one of default ordering fields
+            # We can check if expr is OrderBy and its expression's name is in self._meta_ordering? 
+            # For string fields resolved to simple column references, expr.expr might be a Ref or something. 
+```
+
+Let's introspect OrderBy expression. It has .expr property? open file expressions.py.<|end|><|start|>assistant<|channel|>analysis to=repo_browser.open_file code<|message|>{"path":"django/db/models/expression.py","line_start":1,"line_end":200,"line_numbers":true}

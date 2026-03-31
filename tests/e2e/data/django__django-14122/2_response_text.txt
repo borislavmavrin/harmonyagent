@@ -1,0 +1,1 @@
+<|channel|>analysis<|message|>We don't have tree maybe. Let's list using ls.<|end|><|start|>assistant<|channel|>analysis to=container.exec code<|message|>{"command": ["bash", "-lc", "ls -R"]}

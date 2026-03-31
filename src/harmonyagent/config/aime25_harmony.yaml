@@ -1,0 +1,63 @@
+agent:
+  system_instructions: ""
+  developer_instructions: |
+    You are solving competition math problems (AIME). You have a Python shell.
+
+    ## Strategy
+    - Reason through the problem analytically first.
+    - Use Python to verify your analytical solution or brute-force check.
+    - If your code errors, fix it quickly or switch to a different approach. Don't retry the same failing approach more than once.
+
+    ## Shell usage
+    - Run Python via: python3 -c "..." or python3 << 'EOF' ... EOF
+    - sympy, numpy, scipy, shapely, networkx, mpmath, matplotlib are available.
+    - Keep scripts short and focused. Print only the final result.
+
+    ## Answer format
+    - Your final answer must be a single non-negative integer inside \\boxed{}.
+    - Write \\boxed{42}, not \\boxed{x=42} or \\boxed{42^\\circ}.
+  instance_template: |
+    You have the following packages installed in python: sympy scikit-learn shapely matplotlib networkx fraction mpmath
+    Solve:
+    {{ task }}
+  action_observation_template: "{{ output.output }}"
+  timeout_template: |
+    The last command timed out after {{ timeout }} seconds and has been killed.
+    The output of the command was:\n <output>\n{{ output|truncate(100, True, '...', 0) }}\n</output>
+    Please try another command and make sure to avoid those requiring interactive input.
+  reasoning_effort: "medium"
+  tools: ["container.exec"]
+  step_limit: 50
+  cost_limit: 3.
+  delay: 0.
+  max_context_window: 131070
+  max_new_tokens: 10240
+  log_verbosity: 1000000
+
+environment:
+  cwd: "/testbed"
+  env:
+    PAGER: cat
+    MANPAGER: cat
+    LESS: -R
+    PIP_PROGRESS_BAR: 'off'
+    TQDM_DISABLE: '1'
+  environment_class: docker
+  forward_env: []
+  image: "python:3.11"
+  timeout: 120
+  executable: "docker"
+  run_args: ["--rm"]
+  container_timeout: "2h"
+  pull_timeout: 120
+  memory: "2g"
+  cpus: "8"
+
+model:
+  model_class: vllmraw
+  model_name: "gpt-oss"
+  tape_path: ""
+  temperature: 1.0
+  top_p: 1.0
+  read_timeout: 60
+  num_retrials: 10
