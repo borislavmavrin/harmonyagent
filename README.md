@@ -28,7 +28,9 @@ uv run python run_aime2025.py
 
 ## Paper
 
-[In harmony with gpt-oss](https://arxiv.org/abs/TODO)
+[In harmony with gpt-oss arxiv](https://arxiv.org/abs/TODO)
+
+[In harmony with gpt-oss](./paper.pdf)
 
 ## Citation
 
