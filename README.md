@@ -28,16 +28,20 @@ uv run python run_aime2025.py
 
 ## Paper
 
-[In harmony with gpt-oss arxiv](https://arxiv.org/abs/TODO)
+[In harmony with gpt-oss arxiv](https://arxiv.org/abs/2604.00362)
 
 [In harmony with gpt-oss](./paper.pdf)
 
 ## Citation
 
 ```bibtex
-@article{mavrin2026harmony,
-  title={In harmony with gpt-oss},
-  author={Mavrin, Borislav},
-  year={2026}
+@misc{mavrin2026harmonygptoss,
+      title={In harmony with gpt-oss}, 
+      author={Borislav Mavrin},
+      year={2026},
+      eprint={2604.00362},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2604.00362}, 
 }
 ```
